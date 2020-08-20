@@ -1,10 +1,8 @@
 import React from "react";
 
-const OrderForm = () => {
-  const onCheckBox = (evt) => {
-    const { name, checked } = evt.target;
-    // dataCheckBox(name, checked);
-  };
+const OrderForm = (props) => {
+  const {values, onInputChange, onSubmit, onCheckboxChange} = props
+ 
   return (
     <>
       <form>
@@ -39,8 +37,8 @@ const OrderForm = () => {
             <input
               type="checkbox"
               name="pineapple"
-              // checked={data.tos}
-              onChange={onCheckBox}
+              checked={values.toppings.pineapple}
+              onChange={onCheckboxChange}
             />
             <label>Pineapple</label>
           </p>
@@ -48,8 +46,8 @@ const OrderForm = () => {
             <input
               type="checkbox"
               name="sausage"
-              // checked={data.tos}
-              onChange={onCheckBox}
+              checked={values.toppings.sausage}
+              onChange={onCheckboxChange}
             />
             <label>Sausage</label>
           </p>
@@ -57,8 +55,8 @@ const OrderForm = () => {
             <input
               type="checkbox"
               name="pepperoni"
-              // checked={data.tos}
-              onChange={onCheckBox}
+              checked={values.toppings.pepperoni}
+              onChange={onCheckboxChange}
             />
             <label>Pepperoni</label>
           </p>
@@ -66,8 +64,8 @@ const OrderForm = () => {
             <input
               type="checkbox"
               name="cheese"
-              // checked={data.tos}
-              onChange={onCheckBox}
+              checked={values.toppings.cheese}
+              onChange={onCheckboxChange}
             />
             <label>Cheese</label>
           </p>
