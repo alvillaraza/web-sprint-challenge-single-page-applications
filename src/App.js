@@ -1,12 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Route } from "react-router-dom";
 import axios from "axios";
+import * as yup from "yup";
+
+import formSchema from "./validation/formSchema";
 import Homepage from "./Homepage";
 import OrderForm from "./OrderForm";
+import Orders from "./Orders";
 
 const initialFormValues = {
   name: "",
   size: "",
+  // Checkboxes //
   toppings: {
     pineapple: false,
     sausage: false,
@@ -15,11 +20,27 @@ const initialFormValues = {
   },
   instructions: "",
 };
+
+const initialFormErrors = {
+  name: "",
+  size: "",
+  // Checkboxes //
+  // toppings: {
+  //   pineapple: false,
+  //   sausage: false,
+  //   pepperoni: false,
+  //   cheese: false,
+  // },
+  instructions: "",
+}
 const initialPizza = [];
+const initialDisabled = true;
 
 const App = () => {
-  const [formValues, setFormValues] = useState(initialFormValues);
   const [pizza, setPizza] = useState(initialPizza);
+  const [formValues, setFormValues] = useState(initialFormValues);
+  const [formErrors, setFormErrors] = useState(initialFormErrors);
+  const [disabled, setDisabled] = useState(initialDisabled);
 
   //////////////// HELPERS ////////////////
   //////////////// HELPERS ////////////////
@@ -33,7 +54,7 @@ const App = () => {
         setPizza(res.data);
       })
       .catch((err) => {
-        debugger;
+        console.log("err");
       });
   };
 
@@ -48,7 +69,7 @@ const App = () => {
         // getFriends() // the price of triggering a new 'getFriends`
       })
       .catch((err) => {
-        debugger;
+        console.log("err");
       })
       .finally(() => {
         setFormValues(initialFormValues);
@@ -58,8 +79,31 @@ const App = () => {
   //////////////// EVENT HANDLERS ////////////////
   //////////////// EVENT HANDLERS ////////////////
   //////////////// EVENT HANDLERS ////////////////
-  const onInputChange = (name, value) => {
+  const onInputChange = (evt) => {
+    const name = evt.target.name;
+    const value = evt.target.value;
+
     // 🔥 STEP 11- RUN VALIDATION WITH YUP
+    yup
+      .reach(formSchema, name)
+      // we can then run validate using the value
+      .validate(value)
+      .then((valid) => {
+        // happy path, we can clear the error message
+        setFormErrors({
+          ...formErrors,
+          [name]: "",
+        });
+      })
+      .catch((err) => {
+        // sad path, does not validate so we set the error message to the message
+        // returned from yup (that we created in our schema)
+        setFormErrors({
+          ...formErrors,
+          [name]: err.errors[0],
+        });
+      });
+
     setFormValues({
       ...formValues,
       [name]: value, // NOT AN ARRAY
@@ -98,10 +142,24 @@ const App = () => {
       ),
 
       instructions: formValues.instructions.trim(),
-      // 🔥 STEP 8- WHAT ABOUT HOBBIES?
     };
     postNewPizza(newPizza);
   };
+
+  //////////////// SIDE EFFECTS ////////////////
+  //////////////// SIDE EFFECTS ////////////////
+  //////////////// SIDE EFFECTS ////////////////
+  useEffect(() => {
+    getPizza();
+  }, []);
+
+  useEffect(() => {
+    // 🔥 STEP 11- ADJUST THE STATUS OF `disabled` EVERY TIME `formValues` CHANGES
+    formSchema.isValid(formValues).then((valid) => {
+      setDisabled(!valid);
+    });
+  }, [formValues]);
+
   return (
     <>
       <h1>Lambda Eats</h1>
@@ -116,7 +174,15 @@ const App = () => {
             onInputChange={onInputChange}
             onSubmit={onSubmit}
             onCheckboxChange={onCheckboxChange}
+            disabled={disabled}
+            errors={formErrors}
           />
+        </Route>
+        <Route exact path="/pizza">
+          {" "}
+          {pizza.map((piz) => {
+            return <Orders key={piz.id} details={piz} />;
+          })}
         </Route>
       </div>
     </>

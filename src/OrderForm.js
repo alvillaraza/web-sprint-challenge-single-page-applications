@@ -1,18 +1,29 @@
 import React from "react";
 
 const OrderForm = (props) => {
-  const {values, onInputChange, onSubmit, onCheckboxChange} = props
- 
+  const {
+    values,
+    onInputChange,
+    onSubmit,
+    onCheckboxChange,
+    disabled,
+    errors,
+  } = props;
+
   return (
     <>
-      <form>
+      <form onSubmit={onSubmit}>
         <h1>Order your Pizza Today!</h1>
         <div>
           <label>
             Name:
-            {/* value={values.name}
-              onChange={onChange} */}
-            <input name="name" placeholder="type name" type="text" />
+            <input
+              value={values.name}
+              onChange={onInputChange}
+              name="name"
+              placeholder="type name"
+              type="text"
+            />
           </label>
 
           {/* ////////// DROPDOWN ////////// */}
@@ -73,21 +84,21 @@ const OrderForm = (props) => {
           <p>
             <label>
               Special Instructions:
-              {/* value={values.name}
-              onChange={onChange} */}
               <input
+                value={values.instructions}
+                onChange={onInputChange}
                 name="instructions"
                 placeholder="Special Instructions"
                 type="text"
               />
             </label>
           </p>
-          <button>Submit Order</button>
-
-          {/* 
-
-
- An Add to Order button that submits form and returns a database record of name, size, toppings and special instructions */}
+          <div className="errors">
+            {/* 🔥 RENDER THE VALIDATION ERRORS HERE */}
+            <div>{errors.name}</div>
+           
+          </div>
+          <button disabled={disabled}>Submit Order</button>
         </div>
       </form>
     </>
